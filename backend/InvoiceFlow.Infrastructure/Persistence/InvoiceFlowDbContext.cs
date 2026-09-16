@@ -11,6 +11,8 @@ public class InvoiceFlowDbContext : DbContext
     {
     }
 
+    public DbSet<User> Users => Set<User>();
+
     public DbSet<Invoice> Invoices => Set<Invoice>();
 
     public DbSet<ApprovalStep> ApprovalSteps => Set<ApprovalStep>();
