@@ -1,16 +1,17 @@
-<header>
-  <h1>InvoiceFlow</h1>
+<header class="mb-4">
+    <h1 class="mb-2">Main Layout</h1>
 
-  <nav>
-    <a routerLink="/">Home</a>
-    <a routerLink="/invoices">Invoices</a>
-    <a routerLink="/payments">Payments</a>
-    <a routerLink="/users">Users</a>
-  </nav>
+    <nav class="flex gap-2">
+        <a routerLink="/">Home</a>
+        <a routerLink="/invoices">Invoices</a>
+        <a routerLink="/payments">Payments</a>
+        <a routerLink="/users">Users</a>
+        <a routerLink="/register">Register</a>
+    </nav>
 </header>
 
-<main>
-  <router-outlet />
+<main class="mb-4">
+    <router-outlet />
 </main>
 
 <footer>© 2026 InvoiceFlow</footer>

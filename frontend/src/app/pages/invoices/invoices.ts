@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-invoices',
-  imports: [],
-  templateUrl: './invoices.html',
-  styleUrl: './invoices.css',
+    selector: 'app-invoices-page',
+    imports: [],
+    templateUrl: './invoices.html',
 })
 export class Invoices {
-  title = 'My Invoices';
+    title = 'My Invoices';
 }

@@ -1,0 +1,17 @@
+<div class="w-[min(calc(100% - 32px), 400px)] m-[80px auto] p-8 border border-[#ddd] rounded-xl">
+    <h1>Sign out</h1>
+    <p>Are you sure you want to sign out?</p>
+
+    <button
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="isLoading"
+        class="w-full p-3 border-none rounded-md bg-[#2563eb] text-white cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+    >
+        {{ isLoading ? 'Signing out...' : 'Sign out' }}
+    </button>
+
+    @if (errorMessage) {
+        <p class="text-red-600">{{ errorMessage }}</p>
+    }
+</div>
