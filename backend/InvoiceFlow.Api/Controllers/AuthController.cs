@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponse>> RegisterUser(RegisterRequest request)
+    public async Task<ActionResult<RegisterResponse>> RegisterUser(RegisterRequest request)
     {
         var email = request.Email.Trim();
 
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
 
         await _dbContext.SaveChangesAsync();
 
-        var response = new AuthResponse
+        var response = new RegisterResponse
         {
             Id = user.Id,
         };
@@ -57,5 +57,34 @@ public class AuthController : ControllerBase
             StatusCodes.Status201Created,
             response
         );
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResponse>> LoginUser(LoginRequest request)
+    {
+        var email = request.Email.Trim();
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+        if (user is null)
+        {
+            return Unauthorized("Email or password is incorrect");
+        }
+
+        var verificationResult = _passwordHasher.VerifyHashedPassword(
+            user,
+            user.PasswordHash,
+            request.Password
+        );
+
+        if (verificationResult is PasswordVerificationResult.Failed)
+        {
+            return Unauthorized("Email or password is incorrect");
+        }
+
+        return Ok(new LoginResponse
+        {
+            Id = user.Id
+        });
     }
 }

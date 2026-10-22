@@ -1,6 +1,10 @@
 namespace InvoiceFlow.Api.Contracts.Auth;
 
-public class AuthResponse
+public class RegisterResponse
+{
+    public Guid Id { get; set; }
+}
+public class LoginResponse
 {
     public Guid Id { get; set; }
 }

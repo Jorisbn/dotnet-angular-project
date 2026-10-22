@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var AllowSpecificOrigins = "AngularClient";
-
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<InvoiceFlowDbContext>(options =>
@@ -14,6 +12,8 @@ builder.Services.AddDbContext<InvoiceFlowDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddOpenApi();
+
+var AllowSpecificOrigins = "AngularClient";
 
 builder.Services.AddCors(options =>
 {
