@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using InvoiceFlow.Api.Contracts.Auth;
 using InvoiceFlow.Domain.Entities;
 using InvoiceFlow.Infrastructure.Persistence;
@@ -85,6 +86,28 @@ public class AuthController : ControllerBase
         return Ok(new LoginResponse
         {
             Id = user.Id
+        });
+    }
+
+    [HttpPatch("reset-password")]
+    public async Task<ActionResult<ResetPasswordResponse>> ResetUserPassword(ResetPasswordRequest request)
+    {
+        var email = request.Email.Trim();
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+        if (user is null)
+        {
+            return Unauthorized("Email is not correct");
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new ResetPasswordResponse
+        {
+            Id = user.Id,
         });
     }
 }
