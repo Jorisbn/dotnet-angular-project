@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using InvoiceFlow.Api.Contracts.Auth;
 using InvoiceFlow.Domain.Entities;
 using InvoiceFlow.Infrastructure.Persistence;
@@ -38,7 +37,7 @@ public class AuthController : ControllerBase
             Id = Guid.NewGuid(),
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Email = request.Email,
+            Email = email,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
         };
