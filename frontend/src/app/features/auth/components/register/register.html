@@ -60,21 +60,25 @@
             }
         </div>
 
-        @if (errorMessage) {
+        @if (errorMessage()) {
             <p
                 class="text-[#c62828]"
                 role="alert"
             >
-                {{ errorMessage }}
+                {{ errorMessage() }}
             </p>
+        }
+
+        @if (message()) {
+            <p role="message">{{ message() }}</p>
         }
 
         <button
             type="submit"
-            [disabled]="isLoading"
-            class="w-full p-3 border-none rounded-md bg-[#2563eb] text-white cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+            [disabled]="isLoading() || !!message()"
+            class="w-full p-3 border-none rounded-md bg-[#2563eb] text-white cursor-pointer disabled:opacity-60"
         >
-            {{ isLoading ? 'Creating user...' : 'Create user' }}
+            {{ isLoading() ? 'Creating user...' : 'Create user' }}
         </button>
     </form>
 </div>

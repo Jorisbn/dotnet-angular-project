@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,8 +11,8 @@ export class LoginForm {
     private fb = inject(FormBuilder);
     private authService = inject(AuthService);
 
-    isLoading = false;
-    errorMessage = '';
+    isLoading = signal(false);
+    errorMessage = signal('');
 
     loginForm = this.fb.nonNullable.group({
         email: ['', [Validators.required, Validators.email]],
@@ -20,24 +20,24 @@ export class LoginForm {
     });
 
     onSubmit(): void {
-        if (this.loginForm.invalid || this.isLoading) {
+        if (this.loginForm.invalid || this.isLoading()) {
             this.loginForm.markAllAsTouched();
             return;
         }
 
-        this.isLoading = true;
-        this.errorMessage = '';
+        this.isLoading.set(true);
+        this.errorMessage.set('');
 
         const { email, password } = this.loginForm.getRawValue();
 
         this.authService.login({ email, password }).subscribe({
-            next: (result) => {
-                ((this.isLoading = false), console.log('login successful', result));
+            next: () => {
+                this.isLoading.set(false);
             },
 
             error: (error) => {
-                this.isLoading = false;
-                this.errorMessage = error.status === 401 ? 'invalid email or password' : 'Unable to log in. Please try again';
+                this.isLoading.set(false);
+                this.errorMessage.set(error.status === 401 ? 'invalid email or password' : 'Unable to log in. Please try again');
             },
         });
     }

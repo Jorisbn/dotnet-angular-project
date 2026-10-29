@@ -38,21 +38,21 @@
             }
         </div>
 
-        @if (errorMessage) {
+        @if (errorMessage()) {
             <p
                 class="text-[#c62828]"
                 role="alert"
             >
-                {{ errorMessage }}
+                {{ errorMessage() }}
             </p>
         }
 
         <button
             type="submit"
-            [disabled]="isLoading"
+            [disabled]="isLoading()"
             class="w-full p-3 border-none rounded-md bg-[#2563eb] text-white cursor-pointer disabled:opacity-60 disabled:cursor-wait"
         >
-            {{ isLoading ? 'Signing in...' : 'Sign in' }}
+            {{ isLoading() ? 'Signing in...' : 'Sign in' }}
         </button>
     </form>
 </div>
