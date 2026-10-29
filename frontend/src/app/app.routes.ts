@@ -7,6 +7,7 @@ import { Payments } from './pages/payments/payments';
 import { Users } from './pages/users/users';
 import { Register } from './pages/register/register';
 import { Login } from './pages/login/login';
+import { Logout } from './pages/logout/logout';
 
 export const routes: Routes = [
     {
@@ -37,6 +38,10 @@ export const routes: Routes = [
             {
                 path: 'login',
                 component: Login,
+            },
+            {
+                path: 'logout',
+                component: Logout,
             },
         ],
     },

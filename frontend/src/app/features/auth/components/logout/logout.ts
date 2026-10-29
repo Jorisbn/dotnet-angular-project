@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,23 +11,22 @@ export class LogoutForm {
     private authService = inject(AuthService);
     private router = inject(Router);
 
-    isLoading = false;
-    errorMessage = '';
+    isLoading = signal(false);
+    errorMessage = signal('');
 
     onSubmit(): void {
-        if (this.isLoading) return;
+        if (this.isLoading() === true) return;
 
-        this.isLoading = true;
-        this.errorMessage = '';
+        this.isLoading.set(true);
+        this.errorMessage.set('');
 
         this.authService.logout().subscribe({
             next: () => {
-                this.isLoading = false;
                 this.router.navigate(['/login']);
             },
             error: () => {
-                this.isLoading = false;
-                this.errorMessage = 'Unable to sign out. Please try again.';
+                this.isLoading.set(false);
+                this.errorMessage.set('Unable to sign out. Please try again.');
             },
         });
     }
