@@ -12,14 +12,11 @@ public class InvoiceFlowDbContext : DbContext
     }
 
     public DbSet<User> Users => Set<User>();
-
     public DbSet<Invoice> Invoices => Set<Invoice>();
-
     public DbSet<ApprovalStep> ApprovalSteps => Set<ApprovalStep>();
-
     public DbSet<Payment> Payments => Set<Payment>();
-
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

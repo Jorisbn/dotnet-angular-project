@@ -1,5 +1,6 @@
 using InvoiceFlow.Domain.Entities;
 using InvoiceFlow.Infrastructure.Persistence;
+using InvoiceFlow.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         return Task.CompletedTask;
     };
 });
+
+builder.Services.AddSingleton<PasswordResetTokenGenerator>();
 
 builder.Services.AddAuthentication();
 

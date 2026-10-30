@@ -10,6 +10,9 @@ public class ResetPasswordRequest
     public string Email { get; set; } = null!;
 
     [Required]
+    public string Token { get; set; } = string.Empty;
+
+    [Required]
     [MinLength(12)]
     [MaxLength(128)]
     public string Password { get; set; } = null!;

@@ -8,7 +8,6 @@ public class LoginResponse
 {
     public Guid Id { get; set; }
 }
-
 public class ResetPasswordResponse
 {
     public Guid Id { get; set; }

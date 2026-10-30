@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using InvoiceFlow.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceFlow.Api.Controllers;
@@ -17,11 +18,13 @@ public class AuthController : ControllerBase
 {
     private readonly InvoiceFlowDbContext _dbContext;
     private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly PasswordResetTokenGenerator _tokenGenerator;
 
-    public AuthController(InvoiceFlowDbContext dbContext, IPasswordHasher<User> passwordHasher)
+    public AuthController(InvoiceFlowDbContext dbContext, IPasswordHasher<User> passwordHasher, PasswordResetTokenGenerator tokenGenerator)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
+        _tokenGenerator = tokenGenerator;
     }
 
     [HttpPost("register")]
@@ -125,8 +128,8 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("reset-password")]
-    public async Task<ActionResult<ResetPasswordResponse>> ResetUserPassword(ResetPasswordRequest request)
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword(ForgotPasswordRequest request)
     {
         var email = request.Email.Trim();
 
@@ -134,16 +137,87 @@ public class AuthController : ControllerBase
 
         if (user is null)
         {
-            return Unauthorized("Email is not correct");
+            return Ok(new
+            {
+                Message = "If an account exists with this email a reset link has been send"
+            });
         }
 
-        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+        var token = _tokenGenerator.GenerateToken();
+        var tokenHash = _tokenGenerator.HashToken(token);
+        var resetToken = new PasswordResetToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            TokenHash = tokenHash,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(30)
+        };
 
         await _dbContext.SaveChangesAsync();
 
-        return Ok(new ResetPasswordResponse
+        var resetUrl = $"https://localhost:4200/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+
+        return Ok(new
         {
-            Id = user.Id,
+            Message = "If an account exists with this email, a reset link has been send",
+            Url = resetUrl
+        });
+    }
+    [HttpPatch("reset-password")]
+    public async Task<ActionResult<ResetPasswordResponse>> ResetUserPassword(ResetPasswordRequest request)
+    {
+        var email = request.Email.Trim();
+
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(x => x.Email == email);
+
+        if (user is null)
+        {
+            return BadRequest("Invalid or expired reset token.");
+        }
+
+        var tokenHash = _tokenGenerator.HashToken(request.Token);
+
+        var resetToken = await _dbContext.PasswordResetTokens
+            .FirstOrDefaultAsync(x =>
+                x.UserId == user.Id &&
+                x.TokenHash == tokenHash &&
+                x.UsedAt == null &&
+                x.ExpiresAt > DateTime.UtcNow
+            );
+
+        if (resetToken is null)
+        {
+            return BadRequest("Invalid or expired reset token.");
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(
+            user,
+            request.Password
+        );
+
+        resetToken.UsedAt = DateTime.UtcNow;
+
+        // Invalidate other outstanding tokens.
+        var otherTokens = await _dbContext.PasswordResetTokens
+            .Where(x =>
+                x.UserId == user.Id &&
+                x.Id != resetToken.Id &&
+                x.UsedAt == null
+            )
+            .ToListAsync();
+
+        foreach (var otherToken in otherTokens)
+        {
+            otherToken.UsedAt = DateTime.UtcNow;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new
+        {
+            Message = "Your password has been successfully reset."
         });
     }
 }
